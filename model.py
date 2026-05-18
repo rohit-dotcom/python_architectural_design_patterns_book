@@ -14,8 +14,6 @@ class Orderline:
 class OutOfStock(Exception):
     pass
 
-
-
 class Batch():
 
     def __init__(self,batch_ref:str,sku:str,qty:int,eta:Optional[date]):
