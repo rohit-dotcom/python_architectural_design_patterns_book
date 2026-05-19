@@ -57,7 +57,7 @@ def determine_actions(source_hashes,dest_hashes,source_folder,dest_folder):
     #if destnation file not present in source file the delete action
     for sha,filename in dest_hashes.items():
         if sha not in source_hashes:
-            yield "DELETE",Path(filename)
+            yield "DELETE",Path(dest_folder)/filename
 
 
 
