@@ -26,15 +26,15 @@ def sync(source, dest):
 
             #if there's a file in target that has a different path in source.
             #move it to the correct path
-            elif dest_hash in source_hash and fn!=source_hashes[dest_hash]:
+            elif dest_hash in source_hashes and fn!=source_hashes[dest_hash]:
                 shutil.move(dest_path,Path(folder)/source_hashes[dest_hash])
 
             #for every file that appears in the source but not on the target 
             #copy the file to the target
 
-            for source_hash,fn in source_hases.item():
-                if source_hash not in seen:
-                    shutil.copy(Path(soruce)/fn,Path(dest)/fn)
+    for source_hash,fn in source_hashes.items():
+        if source_hash not in seen:
+            shutil.copy(Path(source) / fn,Path(dest) / fn)
 
 
 def hash_file(path):
