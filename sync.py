@@ -5,36 +5,32 @@ from pathlib import Path
 import shutil
 
 def sync(source, dest):
-    #walk the source folder and build a dict of file name and their hashes
-    source_hashes={}
-    for folder,_,files in os.walk(source):
+    #impetative shell step1, gather inputs
+    source_hashes=read_paths_and_hashes(source)
+    dest_hashes=read_paths_and_hashes(dest)
+
+    #step 2: call functional core
+    actions=determine_actions(source_hashes,dest_hashes,source,dest)
+
+    #imperative shell step2, apply outputs
+    for action,*paths in actions:
+        if action=="COPY":
+            shutil.copy(*paths)
+        if action=="MOVE":
+            shutil.move(*paths)
+        if action=='DELETE':
+            os.remove(paths[0])
+
+
+def read_paths_and_hases(root):
+
+    hashes={}
+    for folder,_,files in os.walk(root):
         for fn in files:
-            source_hashes[hash_file(Path(folder)/fn)]=fn
-    
-    seen=set() #keep a track of the files we've fond in the target
-
-    #walk the target folder and get the file
-    for folder,_,files in os.walk(dest):
-        for fn in files:
-            dest_path=Path(folder)/fn
-            dest_hash=hash_file(dest_path)
-            seen.add(dest_hash)
-
-            #if there's a file in the target thats not in the source, delete it!
-            if dest_hash not in source_hashes:
-                dest_path.remove()
-
-            #if there's a file in target that has a different path in source.
-            #move it to the correct path
-            elif dest_hash in source_hashes and fn!=source_hashes[dest_hash]:
-                shutil.move(dest_path,Path(folder)/source_hashes[dest_hash])
-
-            #for every file that appears in the source but not on the target 
-            #copy the file to the target
-
-    for source_hash,fn in source_hashes.items():
-        if source_hash not in seen:
-            shutil.copy(Path(source) / fn,Path(dest) / fn)
+            path=Path(folder)/fn
+            hash=hash_file(path)
+            hashes[hash]=fn
+    return hashes
 
 
 def hash_file(path):
