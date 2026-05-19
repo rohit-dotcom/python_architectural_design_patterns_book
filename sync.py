@@ -22,7 +22,7 @@ def sync(source, dest):
             os.remove(paths[0])
 
 
-def read_paths_and_hases(root):
+def read_paths_and_hashes(root):
 
     hashes={}
     for folder,_,files in os.walk(root):
@@ -44,7 +44,7 @@ def hash_file(path):
 
 def determine_actions(source_hashes,dest_hashes,source_folder,dest_folder):
     #if file present in source but no in destinations
-    for sha,filename in source_folder.items():
+    for sha,filename in source_hashes.items():
         if sha not in dest_hashes:
             yield "COPY",Path(source_folder)/filename,Path(dest_folder)/filename
         
