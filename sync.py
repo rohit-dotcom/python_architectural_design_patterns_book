@@ -32,7 +32,6 @@ def read_paths_and_hases(root):
             hashes[hash]=fn
     return hashes
 
-
 def hash_file(path):
     hasher=hashlib.sha1()
 
@@ -42,3 +41,23 @@ def hash_file(path):
             hasher.update(buf)
             buf=file.read(BLOCKSIZE)
     return hasher.hexdigest()
+
+def determine_actions(source_hashes,dest_hashes,source_folder,dest_folder):
+    #if file present in source but no in destinations
+    for sha,filename in source_folder.items():
+        if sha not in dest_hashes:
+            yield "COPY",Path(source_folder)/filename,Path(dest_folder)/filename
+        
+    #if file present in destination but renamed in destination
+        elif dest_hashes[sha]!=filename:
+            old_dest_path=Path(dest_folder)/dest_hashes[sha]
+            new_dest_path=Path(dest_folder)/filename
+            yield 'MOVE',old_dest_path,new_dest_path
+
+    #if destnation file not present in source file the delete action
+    for sha,filename in dest_hashes.items():
+        if sha not in source_hashes:
+            yield "DELETE",Path(filename)
+
+
+
