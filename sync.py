@@ -25,8 +25,12 @@ def sync(source, dest):
 def read_paths_and_hases(root):
 
     hashes={}
-    for files,_,fn in os.walk:
-        pass
+    for folder,_,files in os.walk(root):
+        for fn in files:
+            path=Path(folder)/fn
+            hash=hash_file(path)
+            hashes[hash]=fn
+    return hashes
 
 
 def hash_file(path):
