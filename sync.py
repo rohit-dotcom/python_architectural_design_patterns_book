@@ -4,22 +4,34 @@ import os
 from pathlib import Path
 import shutil
 
-def sync(source, dest):
-    #impetative shell step1, gather inputs
-    source_hashes=read_paths_and_hashes(source)
-    dest_hashes=read_paths_and_hashes(dest)
+class FileSystem():
 
-    #step 2: call functional core
-    actions=determine_actions(source_hashes,dest_hashes,source,dest)
+    def read(self,path):
+        return read_paths_and_hashes(path)
+    
+    def copy(self,source,dest):
+        shutil.copy(source,dest)
 
-    #imperative shell step2, apply outputs
-    for action,*paths in actions:
-        if action=="COPY":
-            shutil.copy(*paths)
-        if action=="MOVE":
-            shutil.move(*paths)
-        if action=='DELETE':
-            os.remove(paths[0])
+    def move(self,source,dest):
+        shutil.move(source,dest)
+
+    def delete(dest):
+        os.remove(dest)
+
+
+def sync(source, dest,filesystem=FileSystem):
+    source_hashes=filesystem.read(source)
+    dest_hashes=filesystem.read(dest)
+
+    for sha,filename in source_hashes.items():
+        if sha not in dest_hashes:
+            filesystem.copy(Path(source)/filename,Path(dest)/filename)
+        elif filename!=dest_hashes[sha]:
+            filesystem.move(Path(dest)/dest_hashes[sha],Path(dest)/filename)
+    
+    for sha,filename in dest_hashes.items():
+        if sha not in source_hashes:
+            os.remove(dest/filename)
 
 
 def read_paths_and_hashes(root):
@@ -58,6 +70,5 @@ def determine_actions(source_hashes,dest_hashes,source_folder,dest_folder):
     for sha,filename in dest_hashes.items():
         if sha not in source_hashes:
             yield "DELETE",Path(dest_folder)/filename
-
 
 
