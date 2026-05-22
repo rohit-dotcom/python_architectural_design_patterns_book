@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional,List
 
 
-@dataclass(frozen=True)
+@dataclass(unsafe_hash=True)
 class Orderline:
     orderid:str
     sku:str
