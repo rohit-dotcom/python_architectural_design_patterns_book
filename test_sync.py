@@ -34,13 +34,13 @@ def test_when_a_file_exists_in_source_but_not_the_destination():
 
     sync('/src','/dst',fakefs)
 
-    assert fakefs.action==[('COPY','/src/fn1',
-                      '/dst/fn1')]
+    assert fakefs.action==[('COPY',Path('/src')/'fn1',
+                      Path('/dst')/'fn1')]
 
 def test_when_a_file_is_renamed_in_source():
     fakefs=FakeFileSystem({'/src':{'hash1':'fn1',},'/dst':{'hash1':'fn2'}})
 
     sync('/src','/dst',fakefs)
 
-    assert fakefs.action==[('MOVE','/dst/fn2',
-                      '/dst/fn1')]
+    assert fakefs.action==[('MOVE',Path('/dst')/'fn2',
+                      Path('/dst')/'fn1')]
