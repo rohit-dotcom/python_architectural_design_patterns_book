@@ -9,7 +9,7 @@ import repository
 
 orm.start_mapper()
 get_sesison=sessionmaker(bind=create_engine('config.get_postgressql_url()'))
-app=Flask(__NAME__)/``
+app=Flask(__NAME__)
 
 @app.route("/allocate", method=["POST"])
 def allocate_endpoint():
