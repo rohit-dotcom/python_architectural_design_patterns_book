@@ -4,12 +4,14 @@ COPY requirements.txt /tmp
 
 RUN pip install -r /tmp/requirements.txt
 
-RUN mkdir -p /code
+RUN mkdir -p /src
 
-COPY *.py /code
+COPY *.py /src
 
-WORKDIR /code
+WORKDIR /src
+
+ENV PYTHONPATH=/src
 
 ENV FLASK_APP=flask_app.py FLASK_DEBUG=1 PYTHONUNBUFFERED=1
 
-CMD flask run --host=0.0.0.0 --port=80
+CMD flask run --host=0.0.0.0 --port=80 --debug

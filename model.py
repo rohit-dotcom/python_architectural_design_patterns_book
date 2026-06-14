@@ -82,5 +82,4 @@ def allocate(line:Orderline,batches:List[Batch]):
         earliest_batch.allocate(line)
         return earliest_batch.batch_ref
     except StopIteration:
-        raise OutOfStock(f'Out of stock for {line.sku
-                                             }')
+        raise OutOfStock(f'Out of stock for {line.sku}')
