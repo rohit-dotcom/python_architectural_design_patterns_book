@@ -40,3 +40,34 @@ def test_api_returns_allocations(add_stock):
 
     assert r.status_code==201
     assert r.json()["batchref"]==early_batch
+
+
+@pytest.mark.usefixtures("restart_api")
+def test_400_out_of_stock_error(add_stock):
+    sku, small_batch, large_order=random_sku(),random_batchref(),random_orderid()
+
+    add_stock(
+        [(small_batch,sku,10,"2026-05-25")]
+    )
+
+    url=config.get_api_uri()
+
+    order={"orderid":large_order,"sku":sku,"qty":20}
+
+    r=requests.post(f"{url}/allocate",json=order)
+
+    assert r.status_code==400
+    assert r.json()["message"]==f"Out of stock for {sku}"
+
+@pytest.mark.usefixtures("restart_api")
+def test_400_invalid_sku(add_stock):
+    sku=random_sku()
+
+    url=config.get_api_uri()
+
+    order={"orderid":random_orderid(),"sku":sku,"qty":20}
+
+    r=requests.post(f"{url}/allocate",json=order)
+
+    assert r.status_code==400
+    assert r.json()["message"]==f"Invalid sku {sku}"
