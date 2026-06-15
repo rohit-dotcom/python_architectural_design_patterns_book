@@ -24,7 +24,7 @@ def db_session(in_memory_db):
     clear_mappers()
 
 def wait_for_postgres_to_come_up(engine):
-    deadline=time.time()+5
+    deadline=time.time()+10
     while time.time()<deadline:
         try:
             return engine.connect()

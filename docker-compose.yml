@@ -7,10 +7,10 @@ services:
     depends_on:
       - postgres
     environment:
-      - DS_HOST=postgres
-      - DS_PASSWORD=abc123
+      - DB_HOST=postgres
+      - DB_PASSWORD=abc123
     volumes:
-      - ./:/code  
+      - ./:/src  
     ports:
       - "5005:80"
 

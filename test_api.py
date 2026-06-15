@@ -34,7 +34,7 @@ def test_api_returns_allocations(add_stock):
     )
     url=config.get_api_uri()
 
-    order={"order_id":random_orderid(),"sku":sku,"qty":2,}
+    order={"orderid":random_orderid(),"sku":sku,"qty":2}
 
     r=requests.post(f"{url}/allocate",json=order)
 

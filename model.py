@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Optional,List
 
 
+
 @dataclass(unsafe_hash=True)
 class Orderline:
     orderid:str
@@ -13,8 +14,6 @@ class Orderline:
 
 class OutOfStock(Exception):
     pass
-
-
 
 class Batch():
 

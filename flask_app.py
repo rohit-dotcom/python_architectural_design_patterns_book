@@ -19,7 +19,7 @@ def allocate_endpoint():
     line=model.Orderline(
         request.json['orderid'],request.json['sku'],request.json['qty']
     )
-    batchref=model.Batch.allocate(line,batches)
+    batchref=model.allocate(line,batches)
     return {"batchref":batchref},201
 
 
