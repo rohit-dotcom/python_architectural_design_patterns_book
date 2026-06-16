@@ -56,7 +56,7 @@ class Batch():
 
     def __hash__(self):
 
-        return hash(self.batch_refs)
+        return hash(self.batch_ref)
     
     def __gt__(self,other):
         if self.eta is None:
