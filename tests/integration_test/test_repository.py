@@ -1,5 +1,5 @@
-from model import Batch
-import repository
+from domain.model import Batch
+import adapters.repository as repository
 from sqlalchemy import text
 
 

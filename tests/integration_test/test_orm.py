@@ -1,6 +1,6 @@
-import model
+import domain.model as model
 from sqlalchemy import text
-import orm
+import adapters.orm as orm
 
 
 # from orm import start_mapper

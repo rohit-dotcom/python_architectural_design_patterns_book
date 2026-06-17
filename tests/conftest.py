@@ -6,9 +6,9 @@ from sqlalchemy.exc import OperationalError
 import pytest
 from sqlalchemy import create_engine,text
 from sqlalchemy.orm import sessionmaker,clear_mappers
-from orm import metadata,start_mapper
+from adapters.orm import metadata,start_mapper
 import config
-import orm
+import adapters.orm as orm
 
 @pytest.fixture
 def in_memory_db():

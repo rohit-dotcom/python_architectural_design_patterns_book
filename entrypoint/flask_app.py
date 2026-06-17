@@ -2,10 +2,10 @@ from flask import Flask, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import config
-import orm
-import model
-import repository
-import services
+import adapters.orm as orm
+import domain.model as model
+import adapters.repository as repository
+import services.services as services
 
 
 orm.start_mapper()
