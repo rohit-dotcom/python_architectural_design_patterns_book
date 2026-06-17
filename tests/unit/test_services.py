@@ -1,6 +1,6 @@
-from repository import AbstractRepository
-import model
-import services
+from adapters.repository import AbstractRepository
+import domain.model as model
+import services.services as services
 import pytest
 
 
