@@ -15,7 +15,7 @@ class FakeRepository(AbstractRepository):
 
 
     def get(self,reference)->model.Batch:
-        return next(b for b in self._batches if b.reference==reference)
+        return next(b for b in self._batches if b.batch_ref==reference)
     
     def list(self):
         return list(self._batches)
@@ -26,8 +26,6 @@ class FakeSession():
 
     def commit(self):
         self.committed=True
-
-
 
 def test_returns_allocations():
     batch=model.Batch('b1','s1',100,"2026-05-25")
@@ -56,6 +54,19 @@ def test_commits():
     result=services.allocate(order,repo,session)
 
     assert session.committed is True
+
+def test_dellocates_restores_batch():
+    batch=model.Batch('b1','s1',100,"2026-05-25")
+    order=model.Orderline('o1','s1',10)
+    repo=FakeRepository([batch])
+
+    allocated_batch=services.allocate(order,repo,FakeSession())
+
+    assert repo.get(allocated_batch).available_quantity==90
+
+    allocated_batch=services.deallocate(order,allocated_batch,repo,FakeSession())
+
+    assert repo.get(allocated_batch).available_quantity==100
 
 
 
