@@ -2,6 +2,7 @@ from adapters.repository import AbstractRepository
 import domain.model as model
 import services.services as services
 import pytest
+from datetime import date,timedelta
 
 
 
@@ -15,7 +16,7 @@ class FakeRepository(AbstractRepository):
 
 
     def get(self,reference)->model.Batch:
-        return next(b for b in self._batches if b.reference==reference)
+        return next(b for b in self._batches if b.batch_ref==reference)
     
     def list(self):
         return list(self._batches)
@@ -26,8 +27,6 @@ class FakeSession():
 
     def commit(self):
         self.committed=True
-
-
 
 def test_returns_allocations():
     batch=model.Batch('b1','s1',100,"2026-05-25")
@@ -56,6 +55,48 @@ def test_commits():
     result=services.allocate(order,repo,session)
 
     assert session.committed is True
+
+def test_dellocates_restores_batch():
+    batch=model.Batch('b1','s1',100,"2026-05-25")
+    order=model.Orderline('o1','s1',10)
+    repo=FakeRepository([batch])
+
+    allocated_batch=services.allocate(order,repo,FakeSession())
+
+    assert repo.get(allocated_batch).available_quantity==90
+
+    services.deallocate(order,repo,FakeSession())
+
+    assert repo.get(allocated_batch).available_quantity==100
+
+def test_deallocate_the_unallocated_batch():
+    batch=model.Batch('b1','s1',100,"2026-05-25")
+    order=model.Orderline('o1','s1',10)
+    repo=FakeRepository([batch])
+
+    services.allocate(order,repo,FakeSession())
+    batch_added=repo.get("b1")
+
+    assert batch_added.available_quantity==90
+
+    services.deallocate(order,repo,FakeSession())
+
+    assert batch_added.available_quantity==100
+
+    services.deallocate(order,repo,FakeSession())
+
+    assert batch_added.available_quantity==100
+
+def test_prefers_current_stock_batches_to_in_transit():
+    in_stock_batch=model.Batch('batch-002','foot-pedestal',qty=100,eta=None)
+    in_shipment_batch=model.Batch('batch-003','foot-pedestal',qty=100,eta=date.today()+timedelta(days=1))
+    repo=FakeRepository([in_stock_batch,in_shipment_batch])
+
+    line=model.Orderline('order-122','foot-pedestal',qty=10)
+
+    services.allocate(line,repo,FakeSession())
+    assert repo.get('batch-002').available_quantity==90
+
 
 
 
