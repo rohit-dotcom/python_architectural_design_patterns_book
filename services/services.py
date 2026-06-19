@@ -1,5 +1,7 @@
 from adapters.repository import AbstractRepository
 import domain.model as model
+from typing import Optional
+from datetime import date
 
 
 class InvalidSku(Exception):
@@ -8,7 +10,14 @@ class InvalidSku(Exception):
 def is_valid_sku(sku,batches):
     return sku in {b.sku for b in batches}
 
-def allocate(line:model.Orderline,repo:AbstractRepository,session)->str:
+def add_batch(batch_ref:str,sku:str,qty:int,eta:Optional[date],repo:AbstractRepository,session)->None:
+    batch=model.Batch(batch_ref,sku,qty,eta)
+    repo.add(batch)
+    session.commit()
+
+
+def allocate(order_id:str,sku:str,qty:int,repo:AbstractRepository,session)->str:
+    line=model.Orderline(order_id,sku,qty)
     batches=repo.list()
     if not is_valid_sku(line.sku,batches):
         raise InvalidSku(f"Invalid sku {line.sku}")
@@ -16,7 +25,8 @@ def allocate(line:model.Orderline,repo:AbstractRepository,session)->str:
     session.commit()
     return batchref
 
-def deallocate(line:model.Orderline,repo:AbstractRepository,session)->str:
+def deallocate(order_id:str,sku:str,qty:int,repo:AbstractRepository,session)->str:
+    line=model.Orderline(order_id,sku,qty)
     batches=repo.list()
     #check if allocated
     if not is_valid_sku(line.sku,batches):
