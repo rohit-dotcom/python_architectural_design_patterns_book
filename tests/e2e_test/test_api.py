@@ -16,23 +16,23 @@ def random_batchref(name=""):
 def random_orderid(name=""):
     return f"order{name}-{random_suffix()}"
 
-
+@pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
-def test_api_returns_allocations(add_stock):
+def test_api_returns_allocations():
     sku,other_sku=random_sku(),random_sku("other")
 
     early_batch=random_batchref(1)
     later_batch=random_batchref(2)
     other_batch=random_batchref(3)
 
-    add_stock(
-        [ 
-        (early_batch,sku,100,"2026-05-25"),
-        (later_batch,sku,100,"2026-05-26"),
-        (other_batch,other_sku,100,"2026-05-25")
-        ]
-    )
     url=config.get_api_uri()
+
+    batches=[{"batch_ref":early_batch,"sku":sku,"qty":100,"eta":"2026-05-25"},
+    {"batch_ref":later_batch,"sku":sku,"qty":100,"eta":"2026-05-26"},
+    {"batch_ref":other_batch,"sku":other_sku,"qty":100,"eta":"2026-05-25"}]
+
+    for batch in batches:
+        requests.post(f"{url}/add_batch",json=batch)
 
     order={"orderid":random_orderid(),"sku":sku,"qty":2}
 
@@ -41,16 +41,29 @@ def test_api_returns_allocations(add_stock):
     assert r.status_code==201
     assert r.json()["batchref"]==early_batch
 
-
+@pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
-def test_400_out_of_stock_error(add_stock):
-    sku, small_batch, large_order=random_sku(),random_batchref(),random_orderid()
-
-    add_stock(
-        [(small_batch,sku,10,"2026-05-25")]
-    )
-
+def test_add_batch():
+    batch=random_batchref()
     url=config.get_api_uri()
+    sku=random_sku()
+
+    batches=[{"batch_ref":batch,"sku":sku,"qty":10,"eta":"2026-05-25"}]
+
+    for batch in batches:
+        r=requests.post(f"{url}/add_batch",json=batch)
+    assert r.status_code==201
+
+@pytest.mark.usefixtures("postgres_db")
+@pytest.mark.usefixtures("restart_api")
+def test_400_out_of_stock_error():
+    sku, small_batch, large_order=random_sku(),random_batchref(),random_orderid()
+    url=config.get_api_uri()
+
+    batches=[{"batch_ref":small_batch,"sku":sku,"qty":10,"eta":"2026-05-25"}]
+    
+    for batch in batches:
+        requests.post(f"{url}/add_batch",json=batch)
 
     order={"orderid":large_order,"sku":sku,"qty":20}
 
@@ -59,8 +72,9 @@ def test_400_out_of_stock_error(add_stock):
     assert r.status_code==400
     assert r.json()["message"]==f"Out of stock for {sku}"
 
+@pytest.mark.usefixtures("postgres_db")
 @pytest.mark.usefixtures("restart_api")
-def test_400_invalid_sku(add_stock):
+def test_400_invalid_sku():
     sku=random_sku()
 
     url=config.get_api_uri()
