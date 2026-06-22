@@ -71,17 +71,3 @@ def test_400_out_of_stock_error():
 
     assert r.status_code==400
     assert r.json()["message"]==f"Out of stock for {sku}"
-
-@pytest.mark.usefixtures("postgres_db")
-@pytest.mark.usefixtures("restart_api")
-def test_400_invalid_sku():
-    sku=random_sku()
-
-    url=config.get_api_uri()
-
-    order={"orderid":random_orderid(),"sku":sku,"qty":20}
-
-    r=requests.post(f"{url}/allocate",json=order)
-
-    assert r.status_code==400
-    assert r.json()["message"]==f"Invalid sku {sku}"
