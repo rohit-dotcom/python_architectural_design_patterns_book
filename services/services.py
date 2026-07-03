@@ -4,6 +4,7 @@ from typing import Optional
 from datetime import date
 
 
+
 class InvalidSku(Exception):
     pass
 
@@ -16,23 +17,26 @@ def add_batch(batch_ref:str,sku:str,qty:int,eta:Optional[date],repo:AbstractRepo
     session.commit()
 
 
-def allocate(order_id:str,sku:str,qty:int,repo:AbstractRepository,session)->str:
+def allocate(order_id:str,sku:str,qty:int,uow:unit_of_work.AbstractUnitOfWork)->str:
+
     line=model.Orderline(order_id,sku,qty)
-    batches=repo.list()
-    if not is_valid_sku(line.sku,batches):
-        raise InvalidSku(f"Invalid sku {line.sku}")
-    batchref=model.allocate(line,batches)
-    session.commit()
+    with uow:
+        batches=uow.batches.list()
+        if not is_valid_sku(line.sku,batches):
+            raise InvalidSku(f"Invalid sku {line.sku}")
+        batchref=model.allocate(line,batches)
+        uow.commit()
     return batchref
 
-def deallocate(order_id:str,sku:str,qty:int,repo:AbstractRepository,session)->str:
+def deallocate(order_id:str,sku:str,qty:int,uow:unit_of_work.AbstractUnitOfWork)->str:
     line=model.Orderline(order_id,sku,qty)
-    batches=repo.list()
+    batches=uow.batches.list()
     #check if allocated
-    if not is_valid_sku(line.sku,batches):
-        raise InvalidSku(f"Invalid sku {line.sku}")
-    sku_batches=[b for b in batches if b.sku==line.sku]
-    for b in sku_batches:
-        b.deallocate(line)
-        session.commit()
+    with uow:
+        if not is_valid_sku(line.sku,batches):
+            raise InvalidSku(f"Invalid sku {line.sku}")
+        sku_batches=[b for b in batches if b.sku==line.sku]
+        for b in sku_batches:
+            b.deallocate(line)
+            uow.commit()
 
