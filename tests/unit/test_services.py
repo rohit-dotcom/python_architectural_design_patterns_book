@@ -3,7 +3,7 @@ import services.services as services
 import pytest
 from datetime import date,timedelta
 from domain import model
-
+from allocations.service_layer.unit_of_work import AbstractUnitOfWork
 
 
 
@@ -95,3 +95,19 @@ def test_prefers_current_stock_batches_to_in_transit():
 
     services.allocate('order-122','foot-pedestal',10,repo,FakeSession())
     assert repo.get('batch-002').available_quantity==90
+
+
+class FakeUnitOfWork(AbstractUnitOfWork):
+
+    def __init__(self):
+        self.batches=FakeRepository([])
+        self.committed=False
+        
+
+
+    def commit():
+        pass
+
+    def rollback():
+        pass
+    
