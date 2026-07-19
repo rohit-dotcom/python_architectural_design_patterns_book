@@ -105,9 +105,14 @@ class FakeUnitOfWork(AbstractUnitOfWork):
         
 
 
-    def commit():
-        pass
+    def commit(self):
+        self.committed=True
 
-    def rollback():
+    def rollback(self):
         pass
     
+def test_add_batch():
+    uow=FakeUnitOfWork()
+    services.add_batch("b1","CRUNCHY-ARMCHAIR",100,None,uow)
+    assert uow.batches.get("b1") is not None
+    assert uow.committed
