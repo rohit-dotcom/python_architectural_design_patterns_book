@@ -1,5 +1,5 @@
 from abc import ABC,abstractmethod
-import domain.model as model
+import allocations.domain.model as model
 
 class AbstractRepository(ABC):
     @abstractmethod

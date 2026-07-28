@@ -1,4 +1,4 @@
-from domain.model import Batch
+from allocations.domain.model import Batch
 import adapters.repository as repository
 from sqlalchemy import text
 

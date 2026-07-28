@@ -1,4 +1,4 @@
-from domain.model import Batch, Orderline,allocate,OutOfStock
+from allocations.domain.model import Batch, Orderline,allocate,OutOfStock
 from datetime import date,timedelta
 import pytest
 

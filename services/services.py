@@ -1,5 +1,5 @@
 from adapters.repository import AbstractRepository
-import domain.model as model
+import allocations.domain.model as model
 from typing import Optional
 from datetime import date
 

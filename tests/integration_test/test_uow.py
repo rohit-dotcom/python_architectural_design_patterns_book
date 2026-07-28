@@ -1,5 +1,5 @@
 import pytest
-from domain import model
+from allocations.domain import model
 from allocations.service_layer import unit_of_work
 from sqlalchemy import text
 

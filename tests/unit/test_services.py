@@ -2,7 +2,7 @@ from adapters.repository import AbstractRepository
 import services.services as services
 import pytest
 from datetime import date,timedelta
-from domain import model
+from allocations.domain import model
 from allocations.service_layer.unit_of_work import AbstractUnitOfWork
 
 
